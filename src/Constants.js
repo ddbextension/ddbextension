@@ -1,4 +1,4 @@
-const configurationId = "be-config";
+const configurationId = "ddbx-config";
 
 const closeTinyMessage = "closetinymessage";
 const addContentToTinyMessage = "addcontenttotinymessage";
