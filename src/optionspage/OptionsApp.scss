@@ -1,0 +1,23 @@
+body {
+    padding: 8px;
+}
+
+.ddbx-option-group {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    .ddbx-option-group-label {
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        .glyphicon {
+            float: right;
+        }
+    }
+    .ddbx-option-group-content {
+        display: none;
+        padding-left: 20px;
+        &.expanded {
+            display: block;
+        }
+    }
+}

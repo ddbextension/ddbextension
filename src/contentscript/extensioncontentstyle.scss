@@ -1,0 +1,36 @@
+:root {
+    --main-color: #e91e63;
+    --main-color-border: lighten(#e91e63, 30%);
+}
+
+// used for action links and tooltips
+@mixin link($color, $font-style) {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &:visited {
+        color: $color !important;
+        font-style: $font-style;
+    }
+}
+
+@mixin icon() {
+    background-color: var(--main-color) !important;
+    -webkit-mask: url(chrome-extension://__MSG_@@extension_id__/webaccessible/images/icon.svg) !important;
+    -webkit-mask-size: cover !important;
+}
+
+.ddbx-qtip .qtip-content {
+    text-align: center !important;
+}
+
+.tooltip-header {
+    background-position-y: 71px !important;
+}
+
+@import "characters/characters";
+@import "references/references";
+@import "tableroll/tableroll";
+@import "tinymce/tinymce";
+@import "tooltips/tooltips";

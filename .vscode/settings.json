@@ -1,0 +1,18 @@
+{
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "javascript.validate.enable": false,
+    "editor.formatOnSave": true,
+    "search.exclude": {
+        "**/.git": true
+    },
+    "explorer.openEditors.visible": 0,
+    "files.exclude": {
+        "node_modules/": true,
+        "build/": true
+    },
+    "workbench.iconTheme": "vscode-icons",
+    "window.zoomLevel": 0,
+    "sort-imports.on-save": false
+}

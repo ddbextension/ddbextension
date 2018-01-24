@@ -1,0 +1,76 @@
+{
+    "name": "DDB Extension",
+    "version": "0.1.0",
+    "description": "Chrome extension with helpers to https://www.dndbeyond.com/.",
+    "background": {
+        "scripts": [
+            "extensionbackground.js"
+        ],
+        "persistent": true
+    },
+    "browser_action": {
+        "default_icon": {
+            "16": "webaccessible/images/icon-16.png",
+            "48": "webaccessible/images/icon-48.png",
+            "32": "webaccessible/images/icon-32.png",
+            "64": "webaccessible/images/icon-64.png",
+            "128": "webaccessible/images/icon-128.png",
+            "256": "webaccessible/images/icon-256.png"
+        },
+        "default_title": "DDB Extension",
+        "default_popup": "extensionpopup.html"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Alt+Shift+D"
+            }
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.dndbeyond.com/*"
+            ],
+            "js": [
+                "extensioncontentscript.js"
+            ],
+            "css": [
+                "extensioncontentstyle.css"
+            ]
+        }
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "externally_connectable": {
+        "matches": [
+            "*://*.dndbeyond.com/*"
+        ]
+    },
+    "icons": {
+        "16": "webaccessible/images/icon-16.png",
+        "48": "webaccessible/images/icon-48.png",
+        "32": "webaccessible/images/icon-32.png",
+        "64": "webaccessible/images/icon-64.png",
+        "128": "webaccessible/images/icon-128.png",
+        "256": "webaccessible/images/icon-256.png"
+    },
+    "incognito": "split",
+    "options_ui": {
+        "page": "optionspage.html",
+        "chrome_style": true
+    },
+    "permissions": [
+        "activeTab",
+        "commands",
+        "cookies",
+        "notifications",
+        "storage",
+        "tabs",
+        "webRequest",
+        "*://*.dndbeyond.com/*"
+    ],
+    "web_accessible_resources": [
+        "webaccessible/*"
+    ],
+    "manifest_version": 2
+}

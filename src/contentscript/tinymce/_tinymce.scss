@@ -1,0 +1,29 @@
+@media screen {
+    // hides editors while ddbx is loading
+    .ddbx-tinymce-loading {
+        .loading-message-wrapper {
+            min-height: 256px !important;
+        }
+        .loading-message {
+            display: block !important;
+        }
+        .mce-tinymce {
+            visibility: hidden !important;
+            height: 0px !important;
+        }
+    }
+    .mce-window {
+        height: auto !important;
+        width: auto !important;
+        iframe[src$='tinymceddbxdialog.html'] {
+            height: 99% !important;
+            width: 99% !important;
+        }
+    }
+    .mce-ddbx-tinymce-button i.mce-ico {
+        @include icon();
+    }
+    .mce-ddbx-fullscreen-tinymce-button i.mce-ico::before {
+        color: var(--main-color) !important;
+    }
+}

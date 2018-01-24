@@ -1,0 +1,82 @@
+import "./OptionsApp.scss";
+
+import { Form, ListGroup } from 'react-bootstrap';
+import React, { Component } from 'react';
+
+import C from "../Constants";
+import CheckBoxField from "../forms/CheckBoxField";
+import ConfigStorageService from "../services/storage/ConfigStorageService";
+import Configuration from "../data/Configuration";
+import FieldService from "../services/FieldService";
+import Opt from "../Options";
+import OptionGroup from "./OptionGroup";
+import StorageService from "../services/storage/StorageService";
+
+class OptionsApp extends Component {
+
+    constructor(props) {
+        super(props);
+
+        const initState = {};
+        Opt.AllOptions.forEach(opt => initState[opt] = false);
+        this.state = initState;
+
+        this.init();
+    }
+
+    init = () => {
+        ConfigStorageService.getConfig().then((config: Configuration) => {
+            const newState = {};
+            Opt.AllOptions.forEach(opt => newState[opt] = config[opt]);
+            this.setState(newState);
+        });
+    }
+
+    updateConfig = () => {
+        ConfigStorageService.getConfig().then((config: Configuration) => {
+            Opt.AllOptions.forEach(opt => config[opt] = this.state[opt]);
+            return StorageService.updateData(config);
+        });
+    }
+
+    changeOptionHandler = (prop: string) => {
+        const baseChangeFunc = FieldService.onToggleFunc(prop, this);
+        return (e) => {
+            baseChangeFunc(e);
+            this.updateConfig();
+        };
+    }
+
+    optionField = (label: string, option: string) => {
+        return <CheckBoxField checkText={label} value={this.state[option]} onChange={this.changeOptionHandler(option)} />;
+    }
+
+    render() {
+        return (
+            <Form>
+                <OptionGroup label="Character Folders">
+                    {this.optionField("Enable folders and sort on 'My Characters' page.", Opt.MyCharactersFolders)}
+                    {this.optionField("Enable folders and sort on campaign pages.", Opt.CampaignCharactersFolders)}
+                </OptionGroup>
+                <OptionGroup label="Editor">
+                    {this.optionField("Enable DDB Extension button on editors.", Opt.EditorButton)}
+                    {this.optionField("Enable Tooltips Tab on DDB Extension Editor Dialog.", Opt.TooltipsTab)}
+                    {this.optionField("Enable Rollable Tables Tab on DDB Extension Editor Dialog.", Opt.TablesTab)}
+                    {this.optionField("Enable Fullscreen button on editors.", Opt.FullscreenButton)}
+                </OptionGroup>
+                <OptionGroup label="Favicons">
+                    {this.optionField("Change character pages favicon.", Opt.CharacterFavIcon)}
+                </OptionGroup>
+                <OptionGroup label="Tooltips">
+                    {this.optionField("Enable Homebrew Tooltips (options on editor, style and error handling).", Opt.HomebrewTooltips)}
+                    {this.optionField("Enable Extra Tooltips (backgrounds and feats).", Opt.CustomTooltips)}
+                    {this.optionField("Enable Reference Tooltips.", Opt.RefTooltips)}
+                </OptionGroup>
+                {this.optionField("Add buttons to copy references on compendium pages.", Opt.RefButtons)}
+                {this.optionField("Enable roll on tables.", Opt.TableRolls)}
+            </Form>
+        );
+    }
+}
+
+export default OptionsApp;

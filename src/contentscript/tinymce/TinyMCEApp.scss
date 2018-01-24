@@ -1,0 +1,60 @@
+#root {
+    .ddbx-content-panel {
+        padding: 8px;
+    }
+    .ddbx-button-toolbar {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+    }
+    .ddbx-tables-tab {
+        .ddbx-tables-add-row {
+            margin-left: 20px;
+        }
+        .ddbx-tables-rows {
+            height: 250px;
+            overflow-y: auto;
+        }
+        .ddbx-tables-result-column .form-group {
+            width: calc(100% - 230px);
+        }
+        .ddbx-tables-remove-row {
+            color: #000 !important;
+            display: inline;
+            margin-left: 18px;
+            opacity: .4;
+            padding: 0px 4px 0px 0px;
+            position: relative;
+            top: 2px;
+            &:focus,
+            &:hover {
+                cursor: pointer;
+                filter: alpha(opacity=70);
+                text-decoration: none;
+                opacity: .7;
+            }
+            &.disabled {
+                opacity: .15;
+            }
+        }
+        .ddbx-tables-min-max {
+            padding-top: 16px;
+            padding-left: 8px;
+        }
+        input {
+            margin: 8px;
+            &[type=number] {
+                width: 72px;
+            }
+            &[type=text] {
+                width: 100%;
+            }
+        }
+    }
+    .Select-input {
+        width: 100%;
+        input {
+            width: 100% !important;
+        }
+    }
+}
