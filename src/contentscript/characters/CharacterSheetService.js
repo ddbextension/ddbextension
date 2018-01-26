@@ -127,19 +127,13 @@ class CharacterSheetService {
             }
         });
         let dis = this.createButton('roll-hit-disadvantage', 'roll-hit-disadvantage', 'Disadvantage', (e) => {
-            if (character.armorClass) {
-                DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (disadvantaged) roll of " + this.disadvantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
-            }
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (disadvantaged) roll of " + this.disadvantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
         });
         let normal = this.createButton('roll-hit', 'roll-hit', 'Roll Hit', (e) => {
-            if (character.armorClass) {
-                DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a roll of " + this.roll('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
-            }
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a roll of " + this.roll('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
         });
         let adv = this.createButton('roll-hit-advantage', 'roll-hit-advantage', 'Advantage', (e) => {
-            if (character.armorClass) {
-                DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (advantaged) roll of " + this.advantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
-            }
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (advantaged) roll of " + this.advantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
         });
         this.branding(damageButton.querySelector('.value'));
         damage.prepend(damageButton);
@@ -263,7 +257,6 @@ class CharacterSheetService {
 
     static loadStatic(mut) {
         if (!loaded) {
-            console.log('static');
             this.getArmorClass();
             this.getInitiative();
             this.getAbilities();
@@ -307,53 +300,6 @@ class CharacterSheetService {
 
                 static disadvantage(dice) {
                     return DiceExp.calcValue(dice, true);
-                }
-
-                static expandAll() {
-                    return new Promise((resolve, reject) => {
-                        let collapseCheck = setInterval(() => {
-                            let collapsed = document.querySelectorAll("div[class$='collapsible-collapsed']");
-                            if (collapsed.length !== 0) {
-                                collapsed.forEach(function (ele) {
-                                    let triggers = ele.querySelectorAll("div[class$='trigger']");
-                                    triggers.forEach(trigger => {
-                                        trigger.click();
-                                    });
-                                });
-                            } else {
-                                let contentHidden = document.querySelectorAll("div[class^='truncated-content truncated-content-hidden']");
-                                contentHidden.forEach(function (ele) {
-                                    let triggers = ele.querySelectorAll("span[class='truncated-content-trigger-label']");
-                                    triggers.forEach(trigger => {
-                                        trigger.click();
-                                    });
-                                });
-                                clearInterval(collapseCheck);
-                                console.log('everything is expanded');
-                                resolve();
-                            }
-                        }, 100);
-                    });
-                }
-
-                static collapseAll() {
-                    return new Promise((resolve, reject) => {
-                        let expandCheck = setInterval(() => {
-                            let collapsed = document.querySelectorAll("div[class$='collapsible-opened']");
-                            if (collapsed.length !== 0) {
-                                collapsed.forEach(function (ele) {
-                                    let triggers = ele.querySelectorAll("div[class$='trigger']");
-                                    triggers.forEach(trigger => {
-                                        trigger.click();
-                                    });
-                                });
-                            } else {
-                                clearInterval(expandCheck);
-                                console.log('everything is collapsed');
-                                resolve();
-                            }
-                        }, 100);
-                    });
                 }
 
                 static getCharacterName() {
@@ -492,196 +438,6 @@ class CharacterSheetService {
                         };
                     });
                 }
-
-                static getProficiencies() {
-                    let proficiencies = [];
-                    let rows = document.querySelectorAll("ul[class='feature-proficiencies']");
-                    rows.forEach(row => {
-                        row.querySelectorAll("li[class='feature-proficiencies-item']").forEach(prof => {
-                            let proficiency = prof.textContent;
-                            proficiencies.push(proficiency);
-                            let profButton = this.createButton(proficiency, proficiency, 'Roll', (e) => {
-                                DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + proficiency + " of " + this.roll('1d20' + (character.proficiency >= 0 ? '+' : '') + character.proficiency));
-                            });
-                            this.branding(profButton.querySelector('.value'));
-                            prof.appendChild(profButton);
-                        });
-                    });
-                    return proficiencies;
-                }
-
-                static getAttacks() {
-                    let attacks = [];
-                    let rows = document.querySelectorAll("div[class^='attack-list-item']");
-                    rows.forEach(row => {
-                        let attack = {};
-                        attack.name = row.querySelector("span[class='attack-list-heading-text']").textContent;
-                        if (attack.name.indexOf('span') !== -1) {
-                            let start = attack.name.indexOf('>') + 1;
-                            let end = attack.name.indexOf('</');
-                            attack.name = attack.name.substring(start, end);
-                        }
-                        let tohit = row.querySelector("div[class='attack-item-callout-tohit-value attack-item-callout-value']");
-                        if (tohit) {
-                            attack.tohit = Number(tohit.textContent) || 0;
-                            let tohitButton = this.createButton(attack.name, attack.name, 'Roll', (e) => {
-                                DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a roll of " + this.roll('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
-                            });
-                            this.branding(tohitButton.querySelector('.value'));
-                            tohit.parentNode.appendChild(tohitButton);
-                        }
-                        let value = row.querySelector("div[class='attack-item-callout-dmg-value attack-item-callout-value']");
-                        if (value) {
-                            attack.value = this.reactText(value.textContent);
-                            let attackButton = this.createButton(attack.name, attack.name, 'Roll', (e) => {
-                                if (attack.value.indexOf('d') !== -1) {
-                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage");
-                                } else {
-                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage");
-                                }
-                            });
-                            this.branding(attackButton.querySelector('.value'));
-                            value.parentNode.appendChild(attackButton);
-                        }
-
-                        attacks.push(attack);
-                    });
-                    return attacks;
-                }
-
-                static getFeats() {
-                    let feats = [];
-                    let rows = document.querySelectorAll("div[class='feature-group']");
-                    rows.forEach(row => {
-                        let feat = {};
-                        feat.name = row.querySelector("div[class='feature-group-heading']").textContent;
-                        feat.body = row.querySelector("div[class='feat-desc']").textContent;
-                        let featButton = this.createButton(feat.name, feat.name, 'Send', (e) => {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " has a feat of " + feat.name + ": " + feat.body);
-                        });
-                        this.branding(featButton.querySelector('.value'));
-                        row.querySelector("div[class='feature-group-heading']").appendChild(featButton);
-                        feats.push(feat);
-                    });
-
-                    return feats;
-                }
-
-                static getSpells() {
-                    let spells = [];
-                    let rows = document.querySelectorAll("div[class='class-spell-list-actives']");
-                    rows.forEach(row => {
-                        let rowSpells = row.querySelectorAll("div[class^='spell-list-item '");
-                        rowSpells.forEach(rowSpell => {
-                            let spell = {};
-                            if (rowSpell.querySelector("span[class='spell-list-heading-text']")) {
-                                spell.name = rowSpell.querySelector("span[class='spell-list-heading-text']").textContent;
-                                let desc = (rowSpell.querySelector("div[class='truncated-content-content']") || {}).textContent;
-                                if (desc) {
-                                    spell.desc = desc;
-                                }
-                                if (rowSpell.querySelector("span[class='collapsible-header-callout-extra']")) {
-                                    let type = rowSpell.querySelector("span[class='collapsible-header-callout-extra']").textContent;
-                                    let value = rowSpell.querySelector("span[class='collapsible-header-callout-value']");
-                                    if (type === 'To Hit') {
-                                        spell.tohit = value.textContent;
-                                        let hitButton = this.createButton(spell.name, spell.name, 'Roll', (e) => {
-                                            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + spell.name + " with a roll of " + this.roll('1d20' + spell.tohit) + (spell.desc ? (': ' + spell.desc) : ''));
-                                        });
-                                        this.branding(hitButton.querySelector('.value'));
-                                        value.parentNode.appendChild(hitButton);
-                                    } else {
-                                        spell.dc = value.textContent;
-                                        spell.dcType = type;
-                                        let spellButton = this.createButton(spell.name, spell.name, 'Send', (e) => {
-                                            DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + " with a " + type + " DC of " + spell.dc + (spell.desc ? (': ' + spell.desc) : ''));
-                                        });
-                                        this.branding(spellButton.querySelector('.value'));
-                                        value.parentNode.appendChild(spellButton);
-                                    }
-                                    spell.props = [];
-                                    let props = rowSpell.querySelectorAll("div[class^='prop-list-item']");
-                                    props.forEach(propRow => {
-                                        let prop = {
-                                            label: (propRow.querySelector("div[class='prop-list-item-label']") || {}).textContent,
-                                            value: this.reactText((propRow.querySelector("div[class='prop-list-item-value']") || {}).textContent)
-                                        };
-                                        if (prop.label && prop.value) {
-                                            spell.props.push(prop);
-                                        }
-                                    });
-                                } else {
-                                    let spellButton = this.createButton(spell.name, spell.name, 'Send', (e) => {
-                                        DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + (spell.desc ? (': ' + spell.desc) : ''));
-                                    });
-                                    this.branding(spellButton.querySelector('.value'));
-                                    rowSpell.querySelector("span[class='spell-list-heading-text']").appendChild(spellButton);
-                                }
-                                spells.push(spell);
-                            }
-                        });
-                    });
-
-                    return spells;
-                }
             }
 
             export default CharacterSheetService;
-
-            /*
-            {
-              armorClass: { quick-info-item quick-info-armor-class
-                value: quick-info-item-value
-              }
-              initiative: { quick-info-item quick-info-initiative
-                extra: quick-info-item-value-extra,
-                value: quick-info-item-value (without the extra span)
-              },
-              ability: { character-ability-row
-                value: character-ability-item character-ability-score,
-                name: character-ability-item character-ability-label,
-                modifier: { character-ability-item character-ability-modifier
-                  value: character-ability-stat-value
-                  extra: character-ability-stat-extra
-                },
-                save: { character-ability-item character-ability-save
-                  value: character-ability-stat-value,
-                  extra: character-ability-stat-extra
-                }
-              },
-              skills: [
-                { skill-item
-                  stat: skill-item-stat,
-                  name: skill-item-name,
-                  modifier: { skill-item-modifier
-                    extra: skill-item-modifier-extra,
-                    value: skill-item-modifier-value
-                  }
-                }
-              ],
-              proficiencies: [ feature-proficiencies
-                feature-proficiencies-item
-              ],
-              proficiency: { quick-info-item quick-info-proficiency-bonus
-                value: quick-info-item-value (without the span)
-              },
-              attacks: [ attack-list-item
-                {
-                  name: attack-list-heading-text,
-                  tohit: attack-item-callout-tohit-value attack-item-callout-value,
-                  damage: attack-item-callout-dmg-value attack-item-callout-value
-                }
-              ],
-              feats: [ collapsible-header... <div class="collapsible-heading">Feats</div>
-                { feature-group
-                  name: feature-group-heading,
-                  body: feat-desc
-                }
-              ],
-              spells: [ class-spell-list-actives (multiple)
-                { ^ div spell-list-item
-                    name: span spell-list-heading-text
-                }
-              ]
-            }
-            */
