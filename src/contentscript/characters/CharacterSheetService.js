@@ -109,6 +109,15 @@ class CharacterSheetService {
             if (tohit) {
                 attack.tohit = Number(tohit.textContent) || 0;
             }
+            let save = item.parentNode.querySelector("div[class^='attack-item-callout-savedc']");
+            let savedc = save.querySelector("div[class='attack-item-callout-tohit-value attack-item-callout-value']");
+            if (savedc) {
+                attack.savedc = Number(savedc.textContent) || 0;
+            }
+            let savetype = save.querySelector("div[class='attack-item-callout-tohit-label attack-item-callout-label']");
+            if (savetype) {
+                attack.savetype = this.reactText(savetype.textContent).substring(0, 3);
+            }
             let value = item.parentNode.querySelector("div[class='attack-item-callout-dmg-value attack-item-callout-value']");
             if (value) {
                 let verSel = value.querySelector('.attack-item-callout-dmg-versatile');
@@ -121,20 +130,34 @@ class CharacterSheetService {
             }
             let hits = document.createElement('div');
             hits.class = 'natural-attack-detail';
+            let saves = document.createElement('div');
+            saves.class = 'natural-attack-detail';
             let damage = document.createElement('div');
             damage.class = 'natural-attack-detail';
             item.prepend(damage);
+            item.prepend(saves);
             item.prepend(hits);
-            let damageButton = this.createButton('roll-damage', 'roll-damage', 'Roll Damage', (e) => {
-                if (attack.value.indexOf('d') !== -1) {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
-                } else {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
-                }
-            });
+            if (attack.value) {
+                let damageButton = this.createButton('roll-damage', 'roll-damage', 'Roll Damage', (e) => {
+                    if (attack.value.indexOf('d') !== -1) {
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
+                    } else {
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
+                    }
+                });
+                this.branding(damageButton.querySelector('.value'));
+                damage.prepend(damageButton);
+            }
+            if (attack.savedc && attack.savetype) {
+                let saveButton = this.createButton('roll-save', 'roll-save', 'Send Save', (e) => {
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " used " + attack.name + " with a " + attack.savetype + " DC of " + attack.savedc, this.getCharacterName(), this.getCharacterAvatar());
+                });
+                this.branding(saveButton.querySelector('.value'));
+                saves.prepend(saveButton);
+            }
             if (attack.versatile) {
                 let versatileButton = this.createButton('roll-damage', 'roll-damage', 'Roll Versatile Damage', (e) => {
-                    if (attack.value.indexOf('d') !== -1) {
+                    if (attack.versatile.indexOf('d') !== -1) {
                         DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.versatile >= 0 ? '+' : '') + attack.versatile) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
                     } else {
                         DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.versatile + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
@@ -152,8 +175,6 @@ class CharacterSheetService {
             let adv = this.createButton('roll-hit-advantage', 'roll-hit-advantage', 'Advantage', (e) => {
                 DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (advantaged) roll of " + this.advantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit), this.getCharacterName(), this.getCharacterAvatar());
             });
-            this.branding(damageButton.querySelector('.value'));
-            damage.prepend(damageButton);
             this.branding(dis.querySelector('.value'));
             this.branding(normal.querySelector('.value'));
             this.branding(adv.querySelector('.value'));
