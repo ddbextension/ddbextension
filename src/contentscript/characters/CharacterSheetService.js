@@ -344,15 +344,15 @@ class CharacterSheetService {
                 }
 
                 static roll(dice) {
-                    return DiceExp.calcValue(dice, true);
+                    return DiceExp.calcValue(dice).format(dice, true);
                 }
 
                 static advantage(dice) {
-                    return DiceExp.calcValue(dice, true);
+                    return DiceExp.calcValue(dice).format(dice, true);
                 }
 
                 static disadvantage(dice) {
-                    return DiceExp.calcValue(dice, true);
+                    return DiceExp.calcValue(dice).format(dice, true);
                 }
 
                 static getCharacterName() {
