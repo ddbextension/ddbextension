@@ -44,33 +44,32 @@ class CharacterSheetService {
             mutationsList.forEach(mut => {
                 if (mut.addedNodes.length !== 0) {
                     if (mut && mut.target) {
-                        if (mut.target.classList.value.indexOf('character-sheet') !== -1) {
-                            this.loadStatic(mut);
-                        }
-                        if (mut.target.classList.value.indexOf('attack-list-item') !== -1) {
-                            this.attackListItem(mut);
-                        }
-                        // if (mut.target.classList.value.indexOf('ability-pool-spell') !== -1) {
-                        //     this.abilityPoolSpell(mut);
-                        // }
-                        if (mut.target.classList.value.indexOf('spell-list-item') !== -1) {
-                            this.spellListItem(mut);
-                        }
                         if (mut.target.classList.value.indexOf('ReactModalPortal') !== -1) {
                             this.modalPortal(mut);
-                        }
-                        if (mut.target.querySelector('.ability-pool-list')) {
-                            this.abilityPoolSpell(mut.addedNodes[0]);
-                        }
-                        if (mut.target.classList.value.indexOf('character-button-small') !== -1 && !mut.target.querySelector('.value')) {
-                            let temp = mut.target.parentNode.parentNode.parentNode.parentNode.parentNode;
-                            if (temp.classList.value === 'ability-pool') {
-                                // this.abilityPoolSpell(temp); // not working
-                                console.log(temp);
+                        } else {
+                            if (mut.target.classList.value.indexOf('character-sheet') !== -1) {
+                                this.loadStatic(mut);
                             }
-                        }
-                        if (mut.target.querySelector('.feature-proficiencies')) {
-                            this.processProficiencies(mut.target.querySelector('.feature-proficiencies'));
+                            if (mut.target.classList.value.indexOf('attack-list-item') !== -1) {
+                                this.attackListItem(mut);
+                            }
+                            if (mut.target.classList.value.indexOf('spell-list-item') !== -1) {
+                                this.spellListItem(mut);
+                            }
+                            if (mut.target.querySelector('.ability-pool-list')) {
+                                this.abilityPoolSpell(mut.addedNodes[0]);
+                            }
+                            if (mut.addedNodes[0].localName !== 'img') {
+                                if (mut.target.classList.value.indexOf('character-button-small') !== -1 && mut.target.querySelector('.value') === null) {
+                                    let temp = mut.target.parentNode.parentNode.parentNode;
+                                    if (temp.classList.value.indexOf('ability-pool-spell') !== -1) {
+                                        this.abilitySpell(temp);
+                                    }
+                                }
+                            }
+                            if (mut.target.querySelector('.feature-proficiencies')) {
+                                this.processProficiencies(mut.target.querySelector('.feature-proficiencies'));
+                            }
                         }
                     }
                 }
@@ -145,30 +144,35 @@ class CharacterSheetService {
         hits.append(adv);
     }
 
+    static abilitySpell(row) {
+        let abilityName = row.querySelector('.ability-pool-spell-name').innerText;
+        let canUse = row.querySelector('button[class$="character-button-outline"]');
+        if (canUse && !canUse.querySelector('.value')) {
+            this.branding(canUse);
+            canUse.onclick = () => {
+                DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + abilityName, this.getCharacterName(), this.getCharacterAvatar());
+            };
+        }
+        let used = row.querySelector('button[class="character-button-small"]');
+        if (used && !used.querySelector('.value')) {
+            this.branding(used);
+        }
+        let usage = row.querySelector('.ability-pool-spell-usage');
+        if (usage && !usage.querySelector('.value')) {
+            let usageButton = this.createButton('ability-pool', 'ability-pool', usage.innerHTML, (e) => {
+                DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + abilityName, this.getCharacterName(), this.getCharacterAvatar());
+            });
+            usage.class = 'ability-pool-spell-slots';
+            usage.innerHTML = '';
+            this.branding(usageButton.querySelector('.value'));
+            usage.prepend(usageButton);
+        }
+    }
+
     static abilityPoolSpell(mut) {
         let rows = mut.querySelectorAll("div[class^='ability-pool-spell ']");
         rows.forEach(row => {
-            let canUse = row.querySelector('button[class$="character-button-outline"]');
-            if (canUse && !canUse.querySelector('.value')) {
-                this.branding(canUse);
-                canUse.onclick = () => {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something", this.getCharacterName(), this.getCharacterAvatar());
-                };
-            }
-            let used = row.querySelector('button[class="character-button-small"]');
-            if (used && !used.querySelector('.value')) {
-                this.branding(used);
-            }
-            let usage = row.querySelector('.ability-pool-spell-usage');
-            if (usage && !usage.querySelector('.value')) {
-                let usageButton = this.createButton('ability-pool', 'ability-pool', usage.innerHTML, (e) => {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something", this.getCharacterName(), this.getCharacterAvatar());
-                });
-                usage.class = 'ability-pool-spell-slots';
-                usage.innerHTML = '';
-                this.branding(usageButton.querySelector('.value'));
-                usage.prepend(usageButton);
-            }
+            this.abilitySpell(row);
         });
 
     }
