@@ -111,7 +111,13 @@ class CharacterSheetService {
             }
             let value = item.parentNode.querySelector("div[class='attack-item-callout-dmg-value attack-item-callout-value']");
             if (value) {
-                attack.value = this.reactText(value.textContent);
+                let verSel = value.querySelector('.attack-item-callout-dmg-versatile');
+                if (verSel !== null) {
+                    attack.versatile = verSel.textContent;
+                    attack.value = this.reactText(value.textContent).substring(0, this.reactText(value.textContent).length - verSel.textContent.length);
+                } else {
+                    attack.value = this.reactText(value.textContent);
+                }
             }
             let hits = document.createElement('div');
             hits.class = 'natural-attack-detail';
@@ -120,14 +126,23 @@ class CharacterSheetService {
             item.prepend(damage);
             item.prepend(hits);
             let damageButton = this.createButton('roll-damage', 'roll-damage', 'Roll Damage', (e) => {
-                if (character.armorClass) {
-                    if (attack.value.indexOf('d') !== -1) {
-                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
-                    } else {
-                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
-                    }
+                if (attack.value.indexOf('d') !== -1) {
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
+                } else {
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
                 }
             });
+            if (attack.versatile) {
+                let versatileButton = this.createButton('roll-damage', 'roll-damage', 'Roll Versatile Damage', (e) => {
+                    if (attack.value.indexOf('d') !== -1) {
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.versatile >= 0 ? '+' : '') + attack.versatile) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
+                    } else {
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.versatile + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
+                    }
+                });
+                this.branding(versatileButton.querySelector('.value'));
+                damage.prepend(versatileButton);
+            }
             let dis = this.createButton('roll-hit-disadvantage', 'roll-hit-disadvantage', 'Disadvantage', (e) => {
                 DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (disadvantaged) roll of " + this.disadvantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit), this.getCharacterName(), this.getCharacterAvatar());
             });
