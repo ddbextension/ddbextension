@@ -44,7 +44,7 @@ class CharacterSheetService {
             mutationsList.forEach(mut => {
                 if (mut.addedNodes.length !== 0) {
                     if (mut && mut.target) {
-                        if (mut.target.classList.value.indexOf('ReactModalPortal') !== -1) {
+                        if (loaded && mut.target.classList.value.indexOf('ReactModalPortal') !== -1) {
                             this.modalPortal(mut);
                         } else {
                             if (mut.target.classList.value.indexOf('character-sheet') !== -1) {
@@ -59,6 +59,16 @@ class CharacterSheetService {
                             if (mut.target.querySelector('.ability-pool-list')) {
                                 this.abilityPoolSpell(mut.addedNodes[0]);
                             }
+                            mut.target.querySelectorAll('.limited-list-item-callout').forEach(lim => {
+                                if (lim.querySelector('button') !== null) {
+                                    lim.onclick = () => {
+                                        if (lim.querySelector('button[class$="character-button-outline"]') !== null) {
+                                            DiscordService.postMessageToDiscord(this.getCharacterName() + " used " + lim.parentNode.parentNode.querySelector('.collapsible-heading').textContent, this.getCharacterName(), this.getCharacterAvatar());
+                                        }
+                                    };
+                                }
+                            });
+
                             if (mut.addedNodes[0].localName !== 'img') {
                                 if (mut.target.classList.value.indexOf('character-button-small') !== -1 && mut.target.querySelector('.value') === null) {
                                     let temp = mut.target.parentNode.parentNode.parentNode;
@@ -79,6 +89,12 @@ class CharacterSheetService {
         var observer = new MutationObserver(callback);
 
         observer.observe(targetNode, config);
+    }
+
+    static slots(slots) {
+        slots.forEach(slot => {
+            console.log(slot);
+        });
     }
 
     static processProficiencies(mut) {
@@ -216,7 +232,19 @@ class CharacterSheetService {
         rows.forEach(row => {
             this.abilitySpell(row);
         });
-
+        let slots = mut.querySelectorAll('.slot-manager-slot');
+        if (slots.length > 0) {
+            this.branding(mut.querySelector('.slot-manager'));
+        }
+        slots.forEach(slot => {
+            slot.onclick = () => {
+                if (slot.classList.value.indexOf('slot-manager-slot-used') === -1) {
+                    let parent = slot.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                    let slotName = parent.querySelector('.collapsible-heading').textContent;
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + slotName, this.getCharacterName(), this.getCharacterAvatar());
+                }
+            };
+        });
     }
 
     static spellListItem(mut) {
