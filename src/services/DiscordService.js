@@ -9,20 +9,23 @@ class DiscordService {
         discordEnabled = config[Opt.DiscordEnabled];
         discordUrl = config[Opt.DiscordUrl];
     }
-    static postMessageToDiscord(message: string) {
+    static postMessageToDiscord(message: string, username: string = 'DDBX', avatar_url: string = null) {
+
+        const payload = JSON.stringify({
+            content: message,
+            username: username,
+            avatar_url: avatar_url
+        });
+        const params = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: payload
+        };
+        console.log(payload);
         if (discordEnabled === true && discordUrl) {
-            const payload = JSON.stringify({
-                content: message
-            });
-            const params = {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: payload
-            };
-            console.log(message);
-            // fetch(discordUrl, params);
+            fetch(discordUrl, params);
         }
     }
 }

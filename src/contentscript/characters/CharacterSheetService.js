@@ -87,7 +87,7 @@ class CharacterSheetService {
         profs.forEach(prof => {
             let proficiency = prof.textContent;
             prof.onclick = () => {
-                DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + this.roll('1d20' + (character.proficiency >= 0 ? '+' : '') + character.proficiency) + ' for ' + proficiency);
+                DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + this.roll('1d20' + (character.proficiency >= 0 ? '+' : '') + character.proficiency) + ' for ' + proficiency, this.getCharacterName(), this.getCharacterAvatar());
             };
             this.branding(prof);
             prof.style.cursor = 'pointer';
@@ -120,20 +120,20 @@ class CharacterSheetService {
         let damageButton = this.createButton('roll-damage', 'roll-damage', 'Roll Damage', (e) => {
             if (character.armorClass) {
                 if (attack.value.indexOf('d') !== -1) {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage");
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + this.roll((attack.value >= 0 ? '+' : '') + attack.value) + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
                 } else {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage");
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " inflicted " + attack.value + ' ' + attack.name + " damage", this.getCharacterName(), this.getCharacterAvatar());
                 }
             }
         });
         let dis = this.createButton('roll-hit-disadvantage', 'roll-hit-disadvantage', 'Disadvantage', (e) => {
-            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (disadvantaged) roll of " + this.disadvantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (disadvantaged) roll of " + this.disadvantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit), this.getCharacterName(), this.getCharacterAvatar());
         });
         let normal = this.createButton('roll-hit', 'roll-hit', 'Roll Hit', (e) => {
-            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a roll of " + this.roll('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a roll of " + this.roll('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit), this.getCharacterName(), this.getCharacterAvatar());
         });
         let adv = this.createButton('roll-hit-advantage', 'roll-hit-advantage', 'Advantage', (e) => {
-            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (advantaged) roll of " + this.advantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit));
+            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + attack.name + " with a (advantaged) roll of " + this.advantage('1d20' + (attack.tohit >= 0 ? '+' : '') + attack.tohit), this.getCharacterName(), this.getCharacterAvatar());
         });
         this.branding(damageButton.querySelector('.value'));
         damage.prepend(damageButton);
@@ -152,7 +152,7 @@ class CharacterSheetService {
             if (canUse && !canUse.querySelector('.value')) {
                 this.branding(canUse);
                 canUse.onclick = () => {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something");
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something", this.getCharacterName(), this.getCharacterAvatar());
                 };
             }
             let used = row.querySelector('button[class="character-button-small"]');
@@ -162,7 +162,7 @@ class CharacterSheetService {
             let usage = row.querySelector('.ability-pool-spell-usage');
             if (usage && !usage.querySelector('.value')) {
                 let usageButton = this.createButton('ability-pool', 'ability-pool', usage.innerHTML, (e) => {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something");
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + " uses something", this.getCharacterName(), this.getCharacterAvatar());
                 });
                 usage.class = 'ability-pool-spell-slots';
                 usage.innerHTML = '';
@@ -208,12 +208,12 @@ class CharacterSheetService {
             if (spellCasterAction) {
                 item.onclick = () => {
                     if (spell.dcType) {
-                        DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + " with a " + spell.dcType + " DC of " + spell.dc + (spell.desc ? (': ' + spell.desc) : ''));
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + " with a " + spell.dcType + " DC of " + spell.dc + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                     } else {
                         if (spell.tohit || spell.tohit === 0) {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + spell.name + " with a roll of " + this.roll('1d20' + spell.tohit) + (spell.desc ? (': ' + spell.desc) : ''));
+                            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + spell.name + " with a roll of " + this.roll('1d20' + spell.tohit) + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                         } else {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + (spell.desc ? (': ' + spell.desc) : ''));
+                            DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                         }
                     }
                 };
@@ -222,16 +222,16 @@ class CharacterSheetService {
 
                 if (spell.dcType) {
                     spellAction = this.createOversizeButton('spell-action', 'spell-action', 'Send DC', (e) => {
-                        DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + " with a " + spell.dcType + " DC of " + spell.dc + (spell.desc ? (': ' + spell.desc) : ''));
+                        DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + " with a " + spell.dcType + " DC of " + spell.dc + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                     });
                 } else {
                     if (spell.tohit || spell.tohit === 0) {
                         spellAction = this.createOversizeButton('spell-action', 'spell-action', 'Roll to hit', (e) => {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + spell.name + " with a roll of " + this.roll('1d20' + spell.tohit) + (spell.desc ? (': ' + spell.desc) : ''));
+                            DiscordService.postMessageToDiscord(this.getCharacterName() + " attempts to use " + spell.name + " with a roll of " + this.roll('1d20' + spell.tohit) + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                         });
                     } else {
                         spellAction = this.createOversizeButton('spell-action', 'spell-action', 'Send', (e) => {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + (spell.desc ? (': ' + spell.desc) : ''));
+                            DiscordService.postMessageToDiscord(this.getCharacterName() + " uses " + spell.name + (spell.desc ? (': ' + spell.desc) : ''), this.getCharacterName(), this.getCharacterAvatar());
                         });
                     }
                 }
@@ -247,7 +247,7 @@ class CharacterSheetService {
         if (def) {
             let defButton = this.createOversizeButton('armor-class', 'armor-class', 'Send', (e) => {
                 if (character.armorClass) {
-                    DiscordService.postMessageToDiscord(this.getCharacterName() + "'s AC is " + character.armorClass);
+                    DiscordService.postMessageToDiscord(this.getCharacterName() + "'s AC is " + character.armorClass, this.getCharacterName(), this.getCharacterAvatar());
                 }
             });
             this.branding(defButton.querySelector('.value'));
@@ -306,6 +306,11 @@ class CharacterSheetService {
                     return document.querySelector("div[class='character-tidbits-name']").textContent;
                 }
 
+                static getCharacterAvatar() {
+                    let img = document.querySelector("div[class='character-tidbits-avatar']").style['background-image'];
+                    return img.substring(5, img.length - 2);
+                }
+
                 static branding($element, inner = false) {
                     let img = document.createElement('img');
                     img.src = chrome.extension.getURL("webaccessible/images/icon-16.png");
@@ -339,7 +344,7 @@ class CharacterSheetService {
                         }
                         character.initiative = initiative;
                         $element.onclick = () => {
-                            DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled an initative of " + this.roll('1d20' + (initiative >= 0 ? '+' : '') + initiative));
+                            DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled an initative of " + this.roll('1d20' + (initiative >= 0 ? '+' : '') + initiative), this.getCharacterName(), this.getCharacterAvatar());
                         };
                     });
                 }
@@ -379,7 +384,7 @@ class CharacterSheetService {
                             this.branding(mod);
                             mod.onclick = () => {
                                 if (ability.modifier || ability.modifier === 0) {
-                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + ability.name + " of " + this.roll('1d20' + (ability.modifier >= 0 ? '+' : '') + ability.modifier));
+                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + ability.name + " of " + this.roll('1d20' + (ability.modifier >= 0 ? '+' : '') + ability.modifier), this.getCharacterName(), this.getCharacterAvatar());
                                 }
                             };
 
@@ -387,7 +392,7 @@ class CharacterSheetService {
                             this.branding(save);
                             save.onclick = () => {
                                 if (ability.save || ability.save === 0) {
-                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + ability.name + " save of " + this.roll('1d20' + (ability.save >= 0 ? '+' : '') + ability.save));
+                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + ability.name + " save of " + this.roll('1d20' + (ability.save >= 0 ? '+' : '') + ability.save), this.getCharacterName(), this.getCharacterAvatar());
                                 }
                             };
 
@@ -413,7 +418,7 @@ class CharacterSheetService {
                             this.branding(row.querySelector("span[class='skill-item-name']"));
                             row.onclick = () => {
                                 if (skill.value || skill.value === 0) {
-                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + skill.name + " of " + this.roll('1d20' + (skill.value >= 0 ? '+' : '') + skill.value));
+                                    DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a " + skill.name + " of " + this.roll('1d20' + (skill.value >= 0 ? '+' : '') + skill.value), this.getCharacterName(), this.getCharacterAvatar());
                                 }
                             };
 
@@ -425,6 +430,7 @@ class CharacterSheetService {
 
                 static getProficiency() {
                     onElementReady("div[class='quick-info-item quick-info-proficiency-bonus']").then($element => {
+                        this.getCharacterAvatar();
                         let parent = $element
                             .querySelector("div[class='quick-info-item-value']");
 
@@ -433,7 +439,7 @@ class CharacterSheetService {
                         this.branding($element.querySelector('.quick-info-item-value'));
                         $element.onclick = () => {
                             if (character.proficiency) {
-                                DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a proficiency of " + this.roll('1d20' + (character.proficiency >= 0 ? '+' : '') + character.proficiency));
+                                DiscordService.postMessageToDiscord(this.getCharacterName() + " rolled a proficiency of " + this.roll('1d20' + (character.proficiency >= 0 ? '+' : '') + character.proficiency), this.getCharacterName(), this.getCharacterAvatar());
                             }
                         };
                     });
