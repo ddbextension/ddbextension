@@ -126,13 +126,15 @@ class CharacterSheetService {
                 attack.tohit = Number(tohit.textContent) || 0;
             }
             let save = item.parentNode.querySelector("div[class^='attack-item-callout-savedc']");
-            let savedc = save.querySelector("div[class='attack-item-callout-tohit-value attack-item-callout-value']");
-            if (savedc) {
-                attack.savedc = Number(savedc.textContent) || 0;
-            }
-            let savetype = save.querySelector("div[class='attack-item-callout-tohit-label attack-item-callout-label']");
-            if (savetype) {
-                attack.savetype = this.reactText(savetype.textContent).substring(0, 3);
+            if (save !== null) {
+                let savedc = save.querySelector("div[class='attack-item-callout-tohit-value attack-item-callout-value']");
+                if (savedc) {
+                    attack.savedc = Number(savedc.textContent) || 0;
+                }
+                let savetype = save.querySelector("div[class='attack-item-callout-tohit-label attack-item-callout-label']");
+                if (savetype) {
+                    attack.savetype = this.reactText(savetype.textContent).substring(0, 3);
+                }
             }
             let value = item.parentNode.querySelector("div[class='attack-item-callout-dmg-value attack-item-callout-value']");
             if (value) {
