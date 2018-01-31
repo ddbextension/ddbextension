@@ -1,3 +1,4 @@
+import DiceRollResult from "./DiceRollResult";
 
 const diceExpRegex = /^(\s*(\+|-)?\s*(([0-9]{0,10}d[0-9]{1,10})|([0-9]{1,10}))\s*)(\s*(\+|-)\s*(([0-9]{0,10}d[0-9]{1,10})|([0-9]{1,10}))\s*)*$/i;
 
@@ -15,11 +16,14 @@ const rollDice = function (diceValue) {
  * @param {*} term 
  */
 const rollAllDice = function (term: DiceTerm) {
-    var total = 0;
-    for (var i = 0; i < term.numberOfDice; i++) {
-        total += rollDice(term.value);
+    let total = 0;
+    const rolls = [];
+    for (let i = 0; i < term.numberOfDice; i++) {
+        let roll = rollDice(term.value);
+        rolls.push(roll);
+        total += roll;
     }
-    return total;
+    return new DiceRollResult(total, rolls);
 };
 
 class DiceTerm {
@@ -49,26 +53,27 @@ class DiceTerm {
         this.value = safe(Number(variableTokens[1]), Math.MAX_SAFE_INTEGER, Math.MIN_SAFE_INTEGER);
     }
 
-    roll() {
-        if (this.value === 0) return 0;
-        return this.isDice ? rollAllDice(this) : this.value;
+    roll(): DiceRollResult {
+        return this.isDice ? rollAllDice(this) : new DiceRollResult(this.value, []);
     }
 
-    min() {
-        if (this.value === 0) return 0;
-        return this.isDice ? this.numberOfDice : this.value;
+    min(): DiceRollResult {
+        const total = this.isDice ? this.numberOfDice : this.value;
+        const rolls = this.isDice ? Array(this.numberOfDice).fill(1) : [];
+        return new DiceRollResult(total, rolls);
     }
 
-    max() {
-        if (this.value === 0) return 0;
-        return this.isDice ? this.numberOfDice * this.value : this.value;
+    max(): DiceRollResult {
+        const total = this.isDice ? this.numberOfDice * this.value : this.value;
+        const rolls = this.isDice ? Array(this.numberOfDice).fill(this.value) : [];
+        return new DiceRollResult(total, rolls);
     }
 }
 
 /**
  * Calcs a dice expression term.
  */
-const calcTermValue = function (term: string, min: boolean, max: boolean) {
+const calcTermValue = function (term: string, min: boolean, max: boolean): DiceRollResult {
     const termObj = new DiceTerm(term);
     if (min) return termObj.min();
     if (max) return termObj.max();
@@ -78,15 +83,15 @@ const calcTermValue = function (term: string, min: boolean, max: boolean) {
 /**
  * Calcs a dice expression value.
  */
-const calcDiceExpValue = function (diceExp: string, min: boolean, max: boolean) {
+const calcDiceExpValue = function (diceExp: string, min: boolean, max: boolean): DiceRollResult {
     var spaceLessExp = diceExp.replace(/\s/g, "").toLowerCase();
-    var value = 0;
+    var result = new DiceRollResult(0, []);
     var token = "";
     var add = true;
     for (var i = 0; i < spaceLessExp.length; i++) {
         if (spaceLessExp[i] === "+" || spaceLessExp[i] === "-") {
-            if (add) value += calcTermValue(token, min, max);
-            else value -= calcTermValue(token, max, min); // notice max min inverted on subtraction
+            if (add) result.add(calcTermValue(token, min, max));
+            else result.subtract(calcTermValue(token, max, min)); // notice max min inverted on subtraction
 
             add = spaceLessExp[i] === "+";
             token = "";
@@ -94,10 +99,10 @@ const calcDiceExpValue = function (diceExp: string, min: boolean, max: boolean) 
         }
         token += spaceLessExp[i];
     }
-    if (add) value += calcTermValue(token, min, max);
-    else value -= calcTermValue(token, max, min); // notice max min inverted on subtraction
+    if (add) result.add(calcTermValue(token, min, max));
+    else result.subtract(calcTermValue(token, max, min)); // notice max min inverted on subtraction
 
-    return value;
+    return result;
 };
 
 /**
@@ -106,7 +111,7 @@ const calcDiceExpValue = function (diceExp: string, min: boolean, max: boolean) 
  * @param {*} min Uses the min value for every dice.
  * @param {*} max Uses the max value for every dice.
  */
-const baseBalcValue = function (diceExp: string, min: boolean, max: boolean) {
+const baseCalcValue = function (diceExp: string, min: boolean, max: boolean) {
     let innerDiceExp = diceExp;
     if (typeof innerDiceExp !== "string") {
         throw new Error("Only strings are supported.");
@@ -140,7 +145,7 @@ const isValidDiceExpression = function (diceExp: string) {
 
 class DiceExp {
 
-    static isDiceExp(diceExp: string) {
+    static isDiceExp(diceExp: string): boolean {
         if (!diceExp) return false;
         const trimmed = diceExp.trim();
         if (!diceExpRegex.test(trimmed)) return false;
@@ -150,22 +155,22 @@ class DiceExp {
     /**
      * Calcs a dice expression value.
      */
-    static calcValue(diceExp: string) {
-        return baseBalcValue(diceExp);
+    static calcValue(diceExp: string): DiceRollResult {
+        return baseCalcValue(diceExp);
     }
 
     /**
      * Calcs the min value of a dice expression.
      */
-    static calcMinValue(diceExp: string) {
-        return baseBalcValue(diceExp, true);
+    static calcMinValue(diceExp: string): DiceRollResult {
+        return baseCalcValue(diceExp, true);
     }
 
     /**
      * Calcs the max value of a dice expression.
      */
-    static calcMaxValue(diceExp: string) {
-        return baseBalcValue(diceExp, false, true);
+    static calcMaxValue(diceExp: string): DiceRollResult {
+        return baseCalcValue(diceExp, false, true);
     }
 }
 

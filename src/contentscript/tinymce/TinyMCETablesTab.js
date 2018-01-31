@@ -90,7 +90,7 @@ class TinyMCETablesTab extends Component {
     }
 
     isDiceExpPositive = () => {
-        return this.isDiceExpValid() && DiceExp.calcMinValue(this.state.diceExp) >= 0;
+        return this.isDiceExpValid() && DiceExp.calcMinValue(this.state.diceExp).total >= 0;
     }
 
     addAndClose = () => {
@@ -107,8 +107,8 @@ class TinyMCETablesTab extends Component {
     }
 
     addRow = () => {
-        const minValue = DiceExp.calcMinValue(this.state.diceExp);
-        const maxValue = DiceExp.calcMaxValue(this.state.diceExp);
+        const minValue = DiceExp.calcMinValue(this.state.diceExp).total;
+        const maxValue = DiceExp.calcMaxValue(this.state.diceExp).total;
         let startValue = minValue;
         let currentIndex = this.state.rows.length - 1;
         startValue = (() => {
@@ -151,15 +151,15 @@ class TinyMCETablesTab extends Component {
 
     renderMinMaxValue = () => {
         if (!this.isDiceExpValid()) return <div className="ddbx-tables-min-max">Min: N/A&nbsp;&nbsp;&nbsp;&nbsp;Max: N/A</div>;
-        return <div className="ddbx-tables-min-max">Min: {DiceExp.calcMinValue(this.state.diceExp)}&nbsp;&nbsp;&nbsp;&nbsp;Max: {DiceExp.calcMaxValue(this.state.diceExp)}</div>;
+        return <div className="ddbx-tables-min-max">Min: {DiceExp.calcMinValue(this.state.diceExp).total}&nbsp;&nbsp;&nbsp;&nbsp;Max: {DiceExp.calcMaxValue(this.state.diceExp).total}</div>;
     }
 
     renderRows = () => {
         const diceValid = this.isDiceExpValid();
-        const diceMin = diceValid ? DiceExp.calcMinValue(this.state.diceExp) : 0;
+        const diceMin = diceValid ? DiceExp.calcMinValue(this.state.diceExp).total : 0;
         const min = diceMin > 0 ? diceMin : 0;
         let expectedMin = min;
-        const max = diceValid ? DiceExp.calcMaxValue(this.state.diceExp) : Number.MAX_SAFE_INTEGER;
+        const max = diceValid ? DiceExp.calcMaxValue(this.state.diceExp).total : Number.MAX_SAFE_INTEGER;
         return this.state.rows.map((rowData, idx) => {
             const onRemove = this.removeRowHandler(idx);
             if (idx > 0) expectedMin = nextValue(this.state.rows[idx - 1], expectedMin, max);

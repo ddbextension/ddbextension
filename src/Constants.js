@@ -9,6 +9,7 @@ const usernameMessage = "usernamemessage";
 const tooltipErrorMessage = "tooltiperrormessage";
 const commentChangedMessage = "commentchangedmessage";
 const buildTooltipMessage = "buildtooltipmessage";
+const playerRollMessage = "playerrollmessage";
 
 class Constants {
     static get ConfigurationId() {
@@ -41,6 +42,9 @@ class Constants {
     }
     static get BuildTooltipMessage() {
         return buildTooltipMessage;
+    }
+    static get PlayerRollMessage() {
+        return playerRollMessage;
     }
 }
 

@@ -10,6 +10,8 @@ const homebrewTooltips = "homebrewtooltips";
 const customTooltips = "customTooltips";
 const refTooltips = "refTooltips";
 const refButtons = "refButtons";
+const discordUrl = "discordUrl";
+const discordEnabled = "discordEnabled";
 
 const allOptions = [
     tableroll,
@@ -23,7 +25,9 @@ const allOptions = [
     homebrewTooltips,
     customTooltips,
     refTooltips,
-    refButtons
+    refButtons,
+    discordUrl,
+    discordEnabled
 ];
 
 class Options {
@@ -62,6 +66,12 @@ class Options {
     }
     static get RefButtons(): string {
         return refButtons;
+    }
+    static get DiscordEnabled(): string {
+        return discordEnabled;
+    }
+    static get DiscordUrl(): string {
+        return discordUrl;
     }
 
     static get AllOptions(): string[] {
